@@ -1,3 +1,4 @@
+#define VERSION "2"
 #include "Adafruit_NeoPixel.h"
 #include "SarahHome.h"
 
@@ -82,7 +83,7 @@ void pinChanged()
 
 void setup() {
   Serial.begin(9600);
-  sarahHome.setup();
+  sarahHome.setup(VERSION);
 
   char subscribeTopic[100];
   sprintf(subscribeTopic, "%s/%s", sarahHome.getDeviceType().c_str(), sarahHome.getNodeId().c_str());
