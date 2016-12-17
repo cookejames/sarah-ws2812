@@ -1,11 +1,12 @@
-#define VERSION "3"
+#define VERSION "4"
 #include "Adafruit_NeoPixel.h"
 #include "SarahHome.h"
+#include <ArduinoJson.h>
 
 SarahHome sarahHome("lights");
 
 #define LED_PIN 15
-#define NUMPIXELS 100
+#define NUMPIXELS 10
 #define BUTTON_PIN 0
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
 volatile int lastTime = 0;
@@ -23,29 +24,23 @@ void setStrip(int red, int green, int blue) {
 }
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  if (length != 11) {
-    Serial.println("Received invalid message");
+  char json[length];
+  for (int i = 0; i < length; i++) {
+    json[i] = (char) payload[i];
+  }
+
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& root = jsonBuffer.parseObject(json);
+  if (!root.success())
+  {
+    Serial.println("Could not parse payload:");
+    Serial.println(json);
     return;
   }
 
-  char redBuffer[4];
-  redBuffer[0] = (char)payload[0];
-  redBuffer[1] = (char)payload[1];
-  redBuffer[2] = (char)payload[2];
-  redBuffer[3] = '\0';
-  int red = atoi(redBuffer);
-  char greenBuffer[4];
-  greenBuffer[0] = (char)payload[4];
-  greenBuffer[1] = (char)payload[5];
-  greenBuffer[2] = (char)payload[6];
-  greenBuffer[3] = '\0';
-  int green = atoi(greenBuffer);
-  char blueBuffer[4];
-  blueBuffer[0] = (char)payload[8];
-  blueBuffer[1] = (char)payload[9];
-  blueBuffer[2] = (char)payload[10];
-  blueBuffer[3] = '\0';
-  int blue = atoi(blueBuffer);
+  int red = root["r"];
+  int green = root["g"];
+  int blue = root["b"];
 
   Serial.print(red);
   Serial.print(", ");
