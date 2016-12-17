@@ -1,13 +1,12 @@
-#define VERSION "2"
+#define VERSION "3"
 #include "Adafruit_NeoPixel.h"
 #include "SarahHome.h"
 
 SarahHome sarahHome("lights");
 
-#define RANDOM_REG32  ESP8266_DREG(0x20E44)
-#define LED_PIN 0
-#define NUMPIXELS 10
-#define BUTTON_PIN 5
+#define LED_PIN 15
+#define NUMPIXELS 100
+#define BUTTON_PIN 0
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
 volatile int lastTime = 0;
 boolean ledsOn = false;
@@ -87,7 +86,7 @@ void setup() {
 
   char subscribeTopic[100];
   sprintf(subscribeTopic, "%s/%s", sarahHome.getDeviceType().c_str(), sarahHome.getNodeId().c_str());
-  sarahHome.mqttClient.subscribe(subscribeTopic);
+  sarahHome.subscribe(subscribeTopic);
   sarahHome.mqttClient.setCallback(mqttCallback);
 
   pixels.begin(); // This initializes the NeoPixel library.
